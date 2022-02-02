@@ -6,6 +6,9 @@ import EntypoIcon from "react-native-vector-icons/Entypo";
 import IoniconsIcon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../styles/global";
 import { firebase } from "../db/firebase";
+import * as Notifications from "expo-notifications"
+// import Constants from "expo-constants"
+// import * as Permissions from "expo-permissions"
 
 //Go to about
 const pressHandlerHome = () => {
@@ -17,6 +20,15 @@ const pressHandlerDevice = () => {
 const pressHandlerProfile = () => {
   navigation.navigate('Account')
 }
+
+//App Notification config
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 
 export default function Home({ route, navigation }) {
@@ -32,6 +44,8 @@ export default function Home({ route, navigation }) {
   const [activeDevice, setActiveDevice] = useState('124567890');
   const [newestData, setnewestData] = useState('');
   console.log("Route data : " + userdata.user.id)
+
+  const [expoPushToken, setExpoPushToken] = useState('');
 
 
   const fetchUserdata = async () => {
@@ -113,14 +127,65 @@ const fetchNewdata = async () => {
 };
 
 
+// const checkAlerts = async () => {
+//   try {
+    
+//     if(fetchNewdata.pulserate > 120)
+//       console.log("High pulse rate")
+//   } catch (error) {
+    
+//   }
+// }
+
     useEffect(() => {
       const interval = setInterval(() => {
         fetchUserdata();
         fetchNewdata();
       }, 10000);
       return () => clearInterval(interval);
-    }, []);
+    }, [fetchUserdata]);
 
+
+
+
+    async function ImmediatePushNotification() {
+      await Notifications.presentNotificationAsync({
+        title: 'Look at that notification',
+        body: "I'm so proud of myself!",
+      });
+    }
+    
+    const registerForPushNotificationsAsync = async() => {
+        let token;
+        if (Constants.isDevice) {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            alert('Failed to get push token for push notification!');
+            return;
+          }
+          token = (await Notifications.getExpoPushTokenAsync()).data;
+          console.log(token);
+        } else {
+          alert('Must use physical device for Push Notifications');
+        }
+      
+        if (Platform.OS === 'android') {
+          Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+      
+        return token;
+      }
+    
 
   return (
     <View style={globalStyles.container}>

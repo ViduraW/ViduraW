@@ -8,6 +8,7 @@ import Home from './screens/home';
 import Account from './screens/account';
 import Device from './screens/device';
 import AddUser from './screens/adduser';
+import Notification from './screens/Notification';
 import { useFonts } from 'expo-font';
 
 
@@ -26,11 +27,11 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
 
-      {/* <Stack.Screen
-          name="Home"
-          component={Home}
+       {/* <Stack.Screen
+          name="Notification"
+          component={Notification}
           options={{ headerShown: false }}
-        /> */}
+        />  */}
 
         <Stack.Screen
           name="Login"

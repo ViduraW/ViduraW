@@ -8,6 +8,7 @@ import Home from './screens/home';
 import Account from './screens/account';
 import Device from './screens/device';
 import AddUser from './screens/adduser';
+import Analysis from './screens/analysis';
 import { useFonts } from 'expo-font';
 
 
@@ -25,12 +26,12 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-
-      {/* <Stack.Screen
-          name="Home"
-          component={Home}
+{/* 
+      { <Stack.Screen
+          name="Analysis"
+          component={Analysis}
           options={{ headerShown: false }}
-        /> */}
+        />  } */}
 
         <Stack.Screen
           name="Login"

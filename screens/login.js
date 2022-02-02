@@ -83,7 +83,7 @@ export default function Login({ navigation }) {
                     <Text style={styles.login2}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("Home")}
+                    onPress={() => navigation.navigate("AddUser")}
                     style={styles.signUp}
                 >
                     <Text style={styles.signup}>Signup</Text>

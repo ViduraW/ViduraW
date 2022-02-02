@@ -6,6 +6,7 @@ import EntypoIcon from "react-native-vector-icons/Entypo";
 import IoniconsIcon from "react-native-vector-icons/Ionicons";
 import { globalStyles } from "../styles/global";
 import { firebase } from "../db/firebase";
+import Spinner from 'react-native-loading-spinner-overlay'
 
 //Go to about
 const pressHandlerHome = () => {
@@ -30,55 +31,79 @@ export default function Home({ route, navigation }) {
   //  }
  
   const [activeDevice, setActiveDevice] = useState('124567890');
+  const [readingTime, setReadingTime] = useState(5000);
   const [newestData, setnewestData] = useState('');
   console.log("Route data : " + userdata.user.id)
+  const [spinner, setSpinner] = useState(false);
 
+  useEffect(() => {
+    console.log("Fetch userdata after loggin");
+    fetchUserdata();
+    setSpinner(true);
+    setTimeout(() => {
+      setSpinner(false);
+  }, readingTime)
+    console.log("Fetch newdata after loggin");
+    fetchNewdata();
+  }, []);
 
   const fetchUserdata = async () => {
     try {
-      firebase.firestore()
-      .collection('users')
-      .doc(userdata.user.id)
-      .get()
-      .then((doc) => {
-        if (doc.exists) {
-          console.log("user data:", doc.data());
-          const udata = doc.data()
+      // firebase.firestore()
+      // .collection('users')
+      // .doc(userdata.user.id)
+      // .get()
+      // .then((doc) => {
+      //   if (doc.exists) {
+      //     console.log("user data:", doc.data());
+      //     const udata = doc.data()
     
-          console.log((udata.device).length)
-          if ((udata.device) != null && (udata.device).length > 0) {
+      //     console.log((udata.device).length)
+      //     if ((udata.device) != null && (udata.device).length > 0) {
 
-            // {udata.device.map((device, index) => (  
-            //   console.log(device.device_mac)
-            // ))}  
-            //   const i = 0;
-            // while ((udata.device).length > i) {
-            //   item => val === item.name
-            // }
+      //       // {udata.device.map((device, index) => (  
+      //       //   console.log(device.device_mac)
+      //       // ))}  
+      //       //   const i = 0;
+      //       // while ((udata.device).length > i) {
+      //       //   item => val === item.name
+      //       // }
 
-            for (var i = 0; i < (udata.device).length; i++) {
-              console.log("For loop" + udata.device[i])
-              if (udata.device[i].status == true) {
-                console.log("If " + udata.device[i].device_mac)
-                // const ad = udata.device[i].device_mac
-                setActiveDevice(udata.device[i].device_mac)
-                console.log("Active device " + activeDevice)
-                // this.forceUpdate();
-              }
-            }
+      //       for (var i = 0; i < (udata.device).length; i++) {
+      //         console.log("For loop" + udata.device[i])
+      //         if (udata.device[i].status == true) {
+      //           console.log("If " + udata.device[i].device_mac)
+      //           // const ad = udata.device[i].device_mac
+      //           setActiveDevice(udata.device[i].device_mac)
+      //           console.log("Active device " + activeDevice)
+      //           // this.forceUpdate();
+      //         }
+      //       }
 
-          }
+      //     }
 
-          else {
-            console.log("No devices added yet!");
-          }
+      //     else {
+      //       console.log("No devices added yet!");
+      //     }
 
-        } else {
-          console.log("No such document!");
+      //   } else {
+      //     console.log("No such document!");
+      //   }
+      // }).catch((error) => {
+      //   console.log("Error getting document:", error);
+      // });
+
+      
+      for (var i = 0; i < (userdata.user.device).length; i++) {
+        console.log("For loop" + userdata.user.device[i].device_mac)
+        if (userdata.user.device[i].status == true) {
+          console.log("If " + userdata.user.device[i].device_mac)
+          // const ad = udata.device[i].device_mac
+          setActiveDevice(userdata.user.device[i].device_mac)
+          console.log("Active device " + activeDevice)
+          // this.forceUpdate();
         }
-      }).catch((error) => {
-        console.log("Error getting document:", error);
-      });
+      }
 
     } catch (e) {
         console.log(e);
@@ -114,12 +139,15 @@ const fetchNewdata = async () => {
 
 
     useEffect(() => {
+
       const interval = setInterval(() => {
+        console.log("Fetch userdata");
         fetchUserdata();
+        console.log("Fetch newdata");
         fetchNewdata();
-      }, 10000);
+      }, readingTime);
       return () => clearInterval(interval);
-    }, []);
+    }, [activeDevice]);
 
 
   return (
@@ -192,6 +220,11 @@ const fetchNewdata = async () => {
               </View>
             </View>
           </View>
+          <Spinner
+                visible={spinner}
+                textStyle={{ color: "#fff" }}
+                overlayColor="rgba(0,0,0,0.5)"
+            />
         </View>
 
         <View style={styles.rect5}>
